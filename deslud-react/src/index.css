@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+  * { box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #060B18; }
+  ::-webkit-scrollbar-thumb { background: #1464DC; border-radius: 3px; }
+}
+
+@layer components {
+  .font-display { font-family: 'Barlow Condensed', sans-serif; }
+
+  /* Background grid pattern */
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(20,100,220,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20,100,220,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Animated water drop shape */
+  .drop-shape {
+    border-radius: 50% 0 50% 50%;
+    transform: rotate(-45deg);
+  }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* Service card 3D tilt (JS-driven) */
+  .service-card {
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.5s ease;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #00BFFF, #1464DC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glowing border */
+  .border-glow {
+    box-shadow: 0 0 0 1px rgba(20,100,220,0.3), 0 0 20px rgba(20,100,220,0.15);
+  }
+
+  /* Blue gradient bar top */
+  .bar-top::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #1464DC, #00BFFF);
+  }
+
+  /* Form control */
+  .form-input {
+    @apply w-full px-4 py-3.5 bg-white border border-gray-200 rounded-lg
+           font-body text-[15px] text-navy outline-none
+           transition-all duration-200
+           focus:border-blue-deslud focus:ring-2 focus:ring-blue-deslud/10
+           placeholder:text-gray-300;
+  }
+
+  /* Urgence radio custom */
+  .urgence-radio:checked + label {
+    @apply border-blue-deslud bg-blue-deslud/5 text-blue-deslud;
+  }
+}
+
+@layer utilities {
+  .text-shadow-cyan {
+    text-shadow: 0 0 60px rgba(0,191,255,0.4);
+  }
+  .text-shadow-none { text-shadow: none; }
+
+  .animation-delay-600 { animation-delay: 0.6s; }
+  .animation-delay-1200 { animation-delay: 1.2s; }
+  .animation-delay-1800 { animation-delay: 1.8s; }
+  .animation-delay-2400 { animation-delay: 2.4s; }
+  .animation-delay-3000 { animation-delay: 3s; }
+}
