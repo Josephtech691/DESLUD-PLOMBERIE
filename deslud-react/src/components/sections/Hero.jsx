@@ -70,7 +70,7 @@ export default function Hero() {
             {/* Stats row */}
             <div className="mt-14 grid grid-cols-3 divide-x divide-white/[0.06] border border-white/[0.06] rounded-xl overflow-hidden animate-fade-up [animation-delay:0.4s]">
               {[
-                { count: 500, suffix: '+', label: 'Clients satisfaits' },
+                { count: 138, suffix: '+', label: 'Clients satisfaits' },
                 { count: 5, suffix: 'ans', label: "D'expérience" },
                 { count: 24, suffix: 'h/7', label: 'Disponibilité' },
               ].map(({ count, suffix, label }) => (
