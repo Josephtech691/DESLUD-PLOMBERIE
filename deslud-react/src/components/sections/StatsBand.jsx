@@ -4,10 +4,10 @@ import { useLang } from '../../hooks/useLang.jsx';
 export default function StatsBand() {
   const { t } = useLang();
   const stats = [
-    { icon: '🏆', count: 500, suffix: '+', label: t('stats.interventions') },
-    { icon: '⚡', count: 30, suffix: 'min', label: t('stats.delai') },
-    { icon: '😊', count: 98, suffix: '%', label: t('stats.satisfaits') },
-    { icon: '📍', num: 'Tout', label: t('stats.couverture') },
+    { icon: '', count: 138, suffix: '+', label: t('stats.interventions') },
+    { icon: '', count: 30, suffix: 'min', label: t('stats.delai') },
+    { icon: '', count: 94, suffix: '%', label: t('stats.satisfaits') },
+    { icon: '', num: 'Tout', label: t('stats.couverture') },
   ];
   return (
     <div id="stats-band" className="bg-blue-deslud py-7">
