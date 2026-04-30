@@ -4,12 +4,12 @@ import { useLang } from '../../hooks/useLang.jsx';
 
 // 1. Mise à jour des données (chemins d'images au lieu d'emojis)
 const projects = [
-  { id: 1, cat: 'installation', before: '/public/images/install1b.jpg', after: '/public/images/install1a.jpg', title_fr: 'Installation salle de bain complète', title_en: 'Full bathroom installation', loc: 'Bastos, Yaoundé' },
-  { id: 2, cat: 'reparation', before: '/public/images/repar1b.jpg', after: '/public/images/repar1a.jpg, title_fr: 'Réparation fuite sous évier', title_en: 'Under-sink leak repair', loc: 'Nlongkak, Yaoundé' },
-  { id: 3, cat: 'installation', before: '/public/images/install2b.jpg'', after: '/public/images/install1a.jpg', title_fr: 'Installation douche moderne', title_en: 'Modern shower installation', loc: 'Melen, Yaoundé' },
-  { id: 4, cat: 'entretien', before: '/public/images/entre1b.jpg', after: '/public/images/entre1a.jpg', title_fr: 'Entretien réseau complet', title_en: 'Full network maintenance', loc: 'Mvog-Ada, Yaoundé' },
-  { id: 5, cat: 'reparation', before: '/public/images/.jpg', after: '/public/images/.jpg', title_fr: 'Remplacement tuyauterie rouillée', title_en: 'Rusty pipe replacement', loc: 'Biyem-Assi, Yaoundé' },
-  { id: 6, cat: 'installation', before: '/public/images/.jpg', after: '/public/images/.jpg', title_fr: 'Robinetterie haut de gamme', title_en: 'Premium faucet installation', loc: 'Elig-Essono, Yaoundé' },
+  { id: 1, cat: 'installation', before: 'deslud-react/public/images/install1b.jpg', after: 'deslud-react/public/images/install1a.jpg', title_fr: 'Installation salle de bain complète', title_en: 'Full bathroom installation', loc: 'Bastos, Yaoundé' },
+  { id: 2, cat: 'reparation', before: 'deslud-react/public/images/repar1b.jpg', after: 'deslud-react/public/images/repar1a.jpg, title_fr: 'Réparation fuite sous évier', title_en: 'Under-sink leak repair', loc: 'Nlongkak, Yaoundé' },
+  { id: 3, cat: 'installation', before: 'deslud-react/public/images/install2b.jpg'', after: 'deslud-react/public/images/install1a.jpg', title_fr: 'Installation douche moderne', title_en: 'Modern shower installation', loc: 'Melen, Yaoundé' },
+  { id: 4, cat: 'entretien', before: 'deslud-react/public/images/entre1b.jpg', after: 'deslud-react/public/images/entre1a.jpg', title_fr: 'Entretien réseau complet', title_en: 'Full network maintenance', loc: 'Mvog-Ada, Yaoundé' },
+  { id: 5, cat: 'reparation', before: 'deslud-react/public/images/.jpg', after: 'deslud-react/public/images/.jpg', title_fr: 'Remplacement tuyauterie rouillée', title_en: 'Rusty pipe replacement', loc: 'Biyem-Assi, Yaoundé' },
+  { id: 6, cat: 'installation', before: 'deslud-react/public/images/.jpg', after: 'deslud-react/public/images/.jpg', title_fr: 'Robinetterie haut de gamme', title_en: 'Premium faucet installation', loc: 'Elig-Essono, Yaoundé' },
 ];
 
 export default function Gallery() {
