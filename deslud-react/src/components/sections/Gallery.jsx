@@ -6,7 +6,7 @@ import { useLang } from '../../hooks/useLang.jsx';
 const projects = [
   { id: 1, cat: 'installation', before: '/images/install1b.jpg', after: '/images/install1a.jpg', title_fr: 'Installation salle de bain complète', title_en: 'Full bathroom installation', loc: 'Bastos, Yaoundé' },
   { id: 2, cat: 'reparation', before: '/images/repar1b.jpg', after: '/images/repar1a.jpg', title_fr: 'Réparation fuite sous évier', title_en: 'Under-sink leak repair', loc: 'Nlongkak, Yaoundé' },
-  { id: 3, cat: 'installation', before: '/images/install2b.jpg', after: '/images/install1a.jpg', title_fr: 'Installation douche moderne', title_en: 'Modern shower installation', loc: 'Melen, Yaoundé' },
+  { id: 3, cat: 'installation', before: '/images/install2b.jpg', after: '/images/install2a.jpg', title_fr: 'Installation douche moderne', title_en: 'Modern shower installation', loc: 'Melen, Yaoundé' },
   { id: 4, cat: 'entretien', before: '/images/entre1b.jpg', after: '/images/entre1a.jpg', title_fr: 'Entretien réseau complet', title_en: 'Full network maintenance', loc: 'Mvog-Ada, Yaoundé' },
   // N'oublie pas de mettre les vrais noms de fichiers pour les ID 5 et 6 quand tu les auras
   { id: 5, cat: 'reparation', before: '/images/placeholder.jpg', after: '/images/placeholder.jpg', title_fr: 'Remplacement tuyauterie rouillée', title_en: 'Rusty pipe replacement', loc: 'Biyem-Assi, Yaoundé' },
