@@ -89,7 +89,7 @@ export default function Hero() {
           <div className="hidden xl:block relative animate-fade-right [animation-delay:0.2s]">
             {/* Floating badge */}
             <div className="absolute -top-5 -right-5 z-10 bg-gradient-to-br from-blue-deslud to-cyan-deslud rounded-2xl px-5 py-4 text-center shadow-glow animate-float">
-              <div className="font-display font-black text-2xl text-white leading-none">⭐ 4.9</div>
+              <div className="font-display font-black text-2xl text-white leading-none">⭐ 4.6</div>
               <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/80 mt-1">Note clients</div>
             </div>
 
