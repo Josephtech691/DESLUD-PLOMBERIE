@@ -45,7 +45,7 @@ export default function Hero() {
 
           {/* Left — Text */}
           <div>
-            <Badge> Basé à Yaoundé &nbsp;·&nbsp; Tout le Cameroun</Badge>
+            <Badge> Basé à Yaoundé &nbsp;·&nbsp; Et opère dans tout le Cameroun</Badge>
 
             <h1 className="font-display font-black uppercase leading-[0.92] text-white mb-7 text-[clamp(56px,8vw,100px)] animate-fade-up [animation-delay:0.1s]">
               VOTRE<br />
