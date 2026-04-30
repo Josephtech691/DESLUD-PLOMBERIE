@@ -1,11 +1,7 @@
 // src/components/layout/Navbar.jsx
 import { useState, useEffect } from 'react';
-//import { Phone, Menu, X } from 'lucide-react';
+import { Phone, Menu, X } from 'lucide-react';
 import { Btn } from '../ui';
-
-const Phone = "☎️";
-const Menu = "🌐";
-const X = "❌";
 
 const links = [
   { href: '#services', label: 'Services' },
