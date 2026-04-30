@@ -4,18 +4,18 @@ import { useLang } from '../../hooks/useLang.jsx';
 
 // 1. Mise à jour des données (chemins d'images au lieu d'emojis)
 const projects = [
-  { id: 1, cat: 'installation', before: '/images/projects/1-avant.jpg', after: '/images/projects/1-apres.jpg', title_fr: 'Installation salle de bain complète', title_en: 'Full bathroom installation', loc: 'Bastos, Yaoundé' },
-  { id: 2, cat: 'reparation', before: '/images/projects/2-avant.jpg', after: '/images/projects/2-apres.jpg', title_fr: 'Réparation fuite sous évier', title_en: 'Under-sink leak repair', loc: 'Nlongkak, Yaoundé' },
-  { id: 3, cat: 'installation', before: '/images/projects/3-avant.jpg', after: '/images/projects/3-apres.jpg', title_fr: 'Installation douche moderne', title_en: 'Modern shower installation', loc: 'Melen, Yaoundé' },
-  { id: 4, cat: 'entretien', before: '/images/projects/4-avant.jpg', after: '/images/projects/4-apres.jpg', title_fr: 'Entretien réseau complet', title_en: 'Full network maintenance', loc: 'Mvog-Ada, Yaoundé' },
-  { id: 5, cat: 'reparation', before: '/images/projects/5-avant.jpg', after: '/images/projects/5-apres.jpg', title_fr: 'Remplacement tuyauterie rouillée', title_en: 'Rusty pipe replacement', loc: 'Biyem-Assi, Yaoundé' },
-  { id: 6, cat: 'installation', before: '/images/projects/6-avant.jpg', after: '/images/projects/6-apres.jpg', title_fr: 'Robinetterie haut de gamme', title_en: 'Premium faucet installation', loc: 'Elig-Essono, Yaoundé' },
+  { id: 1, cat: 'installation', before: '/public/images/install1b.jpg', after: '/public/images/install1a.jpg', title_fr: 'Installation salle de bain complète', title_en: 'Full bathroom installation', loc: 'Bastos, Yaoundé' },
+  { id: 2, cat: 'reparation', before: '/public/images/repar1b.jpg', after: '/public/images/repar1a.jpg, title_fr: 'Réparation fuite sous évier', title_en: 'Under-sink leak repair', loc: 'Nlongkak, Yaoundé' },
+  { id: 3, cat: 'installation', before: '/public/images/install2b.jpg'', after: '/public/images/install1a.jpg', title_fr: 'Installation douche moderne', title_en: 'Modern shower installation', loc: 'Melen, Yaoundé' },
+  { id: 4, cat: 'entretien', before: '/public/images/entre1b.jpg', after: '/public/images/entre1a.jpg', title_fr: 'Entretien réseau complet', title_en: 'Full network maintenance', loc: 'Mvog-Ada, Yaoundé' },
+  { id: 5, cat: 'reparation', before: '/public/images/.jpg', after: '/public/images/.jpg', title_fr: 'Remplacement tuyauterie rouillée', title_en: 'Rusty pipe replacement', loc: 'Biyem-Assi, Yaoundé' },
+  { id: 6, cat: 'installation', before: '/public/images/.jpg', after: '/public/images/.jpg', title_fr: 'Robinetterie haut de gamme', title_en: 'Premium faucet installation', loc: 'Elig-Essono, Yaoundé' },
 ];
 
 export default function Gallery() {
   const { t, lang } = useLang();
-  const [filter, setFilter] = useState('all');
-  const [selected, setSelected] = useState(null);
+  const [filter, setFilter] = useState('all') ;
+    const [selected, setSelected] = useState(null);
 
   const cats = ['all', 'installation', 'reparation', 'entretien'];
   const filtered = filter === 'all' ? projects : projects.filter(p => p.cat === filter);
