@@ -45,7 +45,7 @@ export default function Hero() {
 
           {/* Left — Text */}
           <div>
-            <Badge>📍 Basé à Yaoundé &nbsp;·&nbsp; Tout le Cameroun</Badge>
+            <Badge> Basé à Yaoundé &nbsp;·&nbsp; Tout le Cameroun</Badge>
 
             <h1 className="font-display font-black uppercase leading-[0.92] text-white mb-7 text-[clamp(56px,8vw,100px)] animate-fade-up [animation-delay:0.1s]">
               VOTRE<br />
@@ -60,7 +60,7 @@ export default function Hero() {
 
             <div className="flex flex-wrap gap-4 animate-fade-up [animation-delay:0.3s]">
               <Btn variant="cyan" onClick={() => handleNav('#contact')}>
-                <span>✅</span> Devis gratuit
+                 Devis gratuit
               </Btn>
               <Btn variant="outline" as="a" href="tel:+237683906225">
                 <span>📞</span> Appeler maintenant
