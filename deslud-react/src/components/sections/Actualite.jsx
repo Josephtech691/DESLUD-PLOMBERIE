@@ -316,9 +316,9 @@ export default function Actualites() {
                 <a
                   href="tel:+237683906225"
                   className="px-5 py-2.5 bg-blue-deslud hover:bg-blue-deslud-2 text-white font-display font-bold text-sm uppercase tracking-wide rounded-xl transition-colors"
-                
+                >
                   📞 {lang === 'fr' ? 'Nous contacter' : 'Contact us'}
-                />
+                </a>
               </div>
             </div>
           </div>
