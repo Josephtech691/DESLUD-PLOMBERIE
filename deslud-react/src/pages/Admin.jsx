@@ -654,7 +654,7 @@ function ActualitesTab({ token }) {
                       : <img src={item.media_url} alt="" className="w-full h-full object-cover" onError={e => e.target.parentElement.style.display='none'} />
                     }
                   </div>
-                )}*/}
+                )}
 function ActualitesTab({ token }) {
   const [items, setItems]       = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -711,7 +711,7 @@ function ActualitesTab({ token }) {
         Gestion des actualités
       </h2>
 
-      {/* ── Formulaire création ── */}
+      {/* ── Formulaire création ── 
       <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-7">
         <h3 className="font-display font-bold text-lg text-navy uppercase tracking-[0.05em] mb-5">
           📰 Publier une actualité
@@ -765,7 +765,7 @@ function ActualitesTab({ token }) {
             </div>
           </div>
 
-          {/* Prévisualisation media */}
+          {/* Prévisualisation media 
           {form.media_url && (
             <div className="border border-gray-100 rounded-xl overflow-hidden">
               <div className="px-4 py-2 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-400">Prévisualisation</div>
@@ -785,7 +785,7 @@ function ActualitesTab({ token }) {
         </form>
       </div>
 
-      {/* ── Liste des actualités ── */}
+      {/* ── Liste des actualités ── 
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <h3 className="font-display font-bold text-base text-navy uppercase tracking-[0.05em]">
@@ -806,7 +806,7 @@ function ActualitesTab({ token }) {
             {items.map(item => (
               <div key={item.id} className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-4 ${!item.actif ? 'opacity-50' : ''}`}>
 
-                {/* Miniature */}
+                {/* Miniature 
                 {item.media_url && (
                   <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                     {item.media_type === 'video'
@@ -816,7 +816,7 @@ function ActualitesTab({ token }) {
                   </div>
                 )}
 
-                {/* Contenu */}
+                {/* Contenu 
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     {item.categorie && (
@@ -841,7 +841,7 @@ function ActualitesTab({ token }) {
                   </div>
                 </div>
 
-                {/* Actions */}
+                {/* Actions 
                 <div className="flex sm:flex-col gap-2 flex-shrink-0">
                   <button onClick={() => handleToggle(item.id)}
                     className={`px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border transition-all text-center
@@ -862,7 +862,7 @@ function ActualitesTab({ token }) {
       </div>
     </div>
   );
-                      }
+                      }*/}
 const TABS = [
   { key: 'dashboard',   icon: '📊', label: 'Dashboard'  },
   { key: 'devis',       icon: '📋', label: 'Devis'      },
