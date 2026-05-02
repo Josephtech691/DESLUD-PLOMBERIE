@@ -496,8 +496,8 @@ function ActualitesTab({ token }) {
 
                 {/* Contenu */}
 function ActualitesTab({ token }) {
-  const [items, setItems] = useState([]);
   const [loading, setLoading]   = useState(true);
+  const [items, setItems] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg]           = useState(null);
   const [form, setForm]         = useState({
