@@ -655,6 +655,166 @@ function ActualitesTab({ token }) {
                     }
                   </div>
                 )}
+function ActualitesTab({ token }) {
+  const [items, setItems]       = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg]           = useState(null);
+  const [form, setForm]         = useState({
+    titre: '', texte: '', media_url: '', media_type: 'texte', categorie: '',
+  });
+
+  const load = () => {
+    setLoading(true);
+    req('/admin/actualites', {}, token)
+      .then(j => { if (j.success) setItems(j.data); setLoading(false); });
+  };
+
+  useEffect(load, [token]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setMsg(null);
+    try {
+      const j = await req('/admin/actualites', {
+        method: 'POST',
+        body: JSON.stringify(form),
+      }, token);
+      if (j.success) {
+        setMsg({ type: 'success', text: '✅ ' + j.message });
+        setForm({ titre: '', texte: '', media_url: '', media_type: 'texte', categorie: '' });
+        load();
+      } else {
+        setMsg({ type: 'error', text: '❌ ' + j.message });
+      }
+    } catch { setMsg({ type: 'error', text: '❌ Erreur serveur.' }); }
+    setSubmitting(false);
+  };
+
+  const handleToggle = async (id) => {
+    await req(`/admin/actualites/${id}/toggle`, { method: 'PATCH' }, token);
+    load();
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Supprimer définitivement cette actualité ?')) return;
+    await req(`/admin/actualites/${id}`, { method: 'DELETE' }, token);
+    load();
+  };
+
+  const inp = 'w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-navy font-body text-[15px] outline-none focus:border-blue-deslud focus:ring-2 focus:ring-blue-deslud/10 transition-all placeholder:text-gray-300';
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-display font-black text-xl sm:text-2xl text-navy uppercase">
+        Gestion des actualités
+      </h2>
+
+      {/* ── Formulaire création ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-7">
+        <h3 className="font-display font-bold text-lg text-navy uppercase tracking-[0.05em] mb-5">
+          📰 Publier une actualité
+        </h3>
+
+        {msg && (
+          <div className={`px-4 py-3 rounded-xl text-sm font-medium mb-5 ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+            {msg.text}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Titre</label>
+              <input value={form.titre} onChange={e => setForm(p => ({ ...p, titre: e.target.value }))}
+                placeholder="Ex: Nouveau service disponible" className={inp} />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Catégorie</label>
+              <input value={form.categorie} onChange={e => setForm(p => ({ ...p, categorie: e.target.value }))}
+                placeholder="Ex: Promotion, Info, Conseil..." className={inp} />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Texte / Description</label>
+            <textarea value={form.texte} onChange={e => setForm(p => ({ ...p, texte: e.target.value }))}
+              placeholder="Décrivez votre actualité en détail..." rows={4}
+              className={`${inp} resize-y min-h-[100px]`} />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">
+                URL de la photo / vidéo <span className="font-normal text-gray-300">(optionnel)</span>
+              </label>
+              <input value={form.media_url} onChange={e => setForm(p => ({ ...p, media_url: e.target.value }))}
+                placeholder="https://... (lien vers image ou vidéo)" className={inp} />
+              <p className="text-[11px] text-gray-300 mt-1.5">
+                💡 Uploadez votre photo sur <strong>imgbb.com</strong> ou <strong>cloudinary.com</strong> gratuitement, puis collez le lien ici.
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Type de média</label>
+              <select value={form.media_type} onChange={e => setForm(p => ({ ...p, media_type: e.target.value }))} className={inp}>
+                <option value="texte">📝 Texte seulement</option>
+                <option value="image">🖼️ Image</option>
+                <option value="video">🎥 Vidéo</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Prévisualisation media */}
+          {form.media_url && (
+            <div className="border border-gray-100 rounded-xl overflow-hidden">
+              <div className="px-4 py-2 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-400">Prévisualisation</div>
+              <div className="p-3">
+                {form.media_type === 'video'
+                  ? <video src={form.media_url} controls className="w-full max-h-48 rounded-lg object-contain bg-black" />
+                  : <img src={form.media_url} alt="preview" className="w-full max-h-48 rounded-lg object-cover" onError={e => e.target.style.display='none'} />
+                }
+              </div>
+            </div>
+          )}
+
+          <button type="submit" disabled={submitting}
+            className="w-full sm:w-auto px-8 py-3.5 bg-blue-deslud hover:bg-blue-deslud-2 text-white font-display font-bold text-base uppercase tracking-wide rounded-xl transition-all disabled:opacity-60">
+            {submitting ? '⏳ Publication...' : '📰 Publier l\'actualité'}
+          </button>
+        </form>
+      </div>
+
+      {/* ── Liste des actualités ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 className="font-display font-bold text-base text-navy uppercase tracking-[0.05em]">
+            Actualités publiées
+          </h3>
+          <span className="text-xs text-gray-400">{items.length} au total</span>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-12 text-gray-400">Chargement…</div>
+        ) : items.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <div className="text-4xl mb-3">📰</div>
+            <div className="font-display font-bold uppercase text-sm">Aucune actualité publiée</div>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {items.map(item => (
+              <div key={item.id} className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-4 ${!item.actif ? 'opacity-50' : ''}`}>
+
+                {/* Miniature */}
+                {item.media_url && (
+                  <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                    {item.media_type === 'video'
+                      ? <div className="w-full h-full flex items-center justify-center bg-navy text-white text-2xl">▶</div>
+                      : <img src={item.media_url} alt="" className="w-full h-full object-cover" onError={e => e.target.parentElement.style.display='none'} />
+                    }
+                  </div>
+                )}
 
                 {/* Contenu */}
                 <div className="flex-1 min-w-0">
@@ -668,7 +828,41 @@ function ActualitesTab({ token }) {
                       {item.actif ? '✅ Visible' : '🙈 Masquée'}
                     </span>
                   </div>
+                  {item.titre && (
+                    <div className="font-display font-black text-base text-navy uppercase leading-tight mb-1">
+                      {item.titre}
+                    </div>
+                  )}
+                  {item.texte && (
+                    <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{item.texte}</p>
+                  )}
+                  <div className="text-[11px] text-gray-300 mt-2">
+                    📅 {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </div>
+                </div>
 
+                {/* Actions */}
+                <div className="flex sm:flex-col gap-2 flex-shrink-0">
+                  <button onClick={() => handleToggle(item.id)}
+                    className={`px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border transition-all text-center
+                      ${item.actif
+                        ? 'border-orange-200 text-orange-600 hover:bg-orange-50'
+                        : 'border-green-200 text-green-600 hover:bg-green-50'}`}>
+                    {item.actif ? '🙈 Masquer' : '✅ Publier'}
+                  </button>
+                  <button onClick={() => handleDelete(item.id)}
+                    className="px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-all">
+                    🗑️ Supprimer
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+                      }
 const TABS = [
   { key: 'dashboard',   icon: '📊', label: 'Dashboard'  },
   { key: 'devis',       icon: '📋', label: 'Devis'      },
