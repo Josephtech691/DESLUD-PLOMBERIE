@@ -156,6 +156,58 @@ router.delete('/admin/services/:id', authenticate, uuidParam('id'), validate, de
 router.get('/admin/temoignages', authenticate, getAllTemoignagesAdmin);
 router.patch('/admin/temoignages/:id/valider', authenticate, uuidParam('id'), validate, validerTemoignage);
 
+
+// ── Actualités (admin) ──
+
+// GET — liste toutes
+router.get('/admin/actualites', authenticate, (req, res, next) => {
+  try {
+    const db = getDb();
+    const items = db.prepare('SELECT * FROM actualites ORDER BY created_at DESC').all();
+    res.json({ success: true, data: items });
+  } catch (error) { next(error); }
+});
+
+// POST — créer
+router.post('/admin/actualites', authenticate, (req, res, next) => {
+  try {
+    const { titre, texte, media_url, media_type, categorie } = req.body;
+    if (!titre && !texte && !media_url) {
+      return res.status(400).json({ success: false, message: 'Au moins un titre, texte ou média est requis.' });
+    }
+    const db = getDb();
+    const { v4: uuidv4 } = require('uuid');
+    const id = uuidv4();
+    db.prepare(`
+      INSERT INTO actualites (id, titre, texte, media_url, media_type, categorie)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(id, titre || null, texte || null, media_url || null, media_type || 'texte', categorie || null);
+    const item = db.prepare('SELECT * FROM actualites WHERE id = ?').get(id);
+    res.status(201).json({ success: true, data: item, message: 'Actualité publiée !' });
+  } catch (error) { next(error); }
+});
+
+// PATCH — activer / désactiver
+router.patch('/admin/actualites/:id/toggle', authenticate, (req, res, next) => {
+  try {
+    const db = getDb();
+    const item = db.prepare('SELECT id, actif FROM actualites WHERE id = ?').get(req.params.id);
+    if (!item) return res.status(404).json({ success: false, message: 'Actualité non trouvée.' });
+    const newActif = item.actif ? 0 : 1;
+    db.prepare('UPDATE actualites SET actif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(newActif, item.id);
+    res.json({ success: true, message: newActif ? 'Actualité publiée.' : 'Actualité masquée.' });
+  } catch (error) { next(error); }
+});
+
+// DELETE — supprimer définitivement
+router.delete('/admin/actualites/:id', authenticate, (req, res, next) => {
+  try {
+    const db = getDb();
+    const result = db.prepare('DELETE FROM actualites WHERE id = ?').run(req.params.id);
+    if (result.changes === 0) return res.status(404).json({ success: false, message: 'Actualité non trouvée.' });
+    res.json({ success: true, message: 'Actualité supprimée.' });
+  } catch (error) { next(error); }
+});
 // ============================================================
 // 🔒 ROUTES ADMIN — Gestion des utilisateurs (super_admin)
 // ============================================================
