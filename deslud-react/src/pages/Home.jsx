@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import SEO from '../components/ui/SEO';
 import Hero from '../components/sections/Hero';
-import Actualites from '../components/sections/Actualites';
+import Actualite from '../components/sections/Actualite';
 import Services from '../components/sections/Services';
 import Pourquoi from '../components/sections/Pourquoi';
 import Processus from '../components/sections/Processus';
@@ -23,7 +23,7 @@ export default function Home({ showToast }) {
           : 'Professional plumber in Yaoundé: sanitary installation, maintenance, 24/7 emergency repairs. ☎ 683 90 62 25'}
       />
       <Hero />
-      <Actualites />
+      <Actualite />
       <Services />
       <Pourquoi />
       <Processus />
