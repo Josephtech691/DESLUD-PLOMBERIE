@@ -641,10 +641,10 @@ export default function Admin() {
           <main className="flex-1 p-4 sm:p-5 lg:p-8 pb-24 lg:pb-8">
             <div className="max-w-6xl mx-auto">
               {tab === 'dashboard'   && <DashboardTab   token={token} />}
-{tab === 'devis'       && <DevisTab       token={token} />}
-{tab === 'contacts'    && <ContactsTab    token={token} />}
-{tab === 'temoignages' && <TemoignagesTab token={token} />}
-{tab === 'actualites'  && <ActualitesTab  token={token} />}
+              {tab === 'devis'       && <DevisTab       token={token} />}
+              {tab === 'contacts'    && <ContactsTab    token={token} />}
+              {tab === 'temoignages' && <TemoignagesTab token={token} />}
+              {tab === 'actualites'  && <ActualitesTab  token={token} />}
             </div>
           </main>
 
