@@ -496,8 +496,8 @@ function ActualitesTab({ token }) {
 
                 {/* Contenu */}
 function ActualitesTab({ token }) {
-  const [loading, setLoading]   = useState(true);
   const [items, setItems] = useState([]);
+  const [loading, setLoading]   = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg]           = useState(null);
   const [form, setForm]         = useState({
@@ -668,41 +668,7 @@ function ActualitesTab({ token }) {
                       {item.actif ? '✅ Visible' : '🙈 Masquée'}
                     </span>
                   </div>
-                  {item.titre && (
-                    <div className="font-display font-black text-base text-navy uppercase leading-tight mb-1">
-                      {item.titre}
-                    </div>
-                  )}
-                  {item.texte && (
-                    <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{item.texte}</p>
-                  )}
-                  <div className="text-[11px] text-gray-300 mt-2">
-                    📅 {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </div>
-                </div>
 
-                {/* Actions */}
-                <div className="flex sm:flex-col gap-2 flex-shrink-0">
-                  <button onClick={() => handleToggle(item.id)}
-                    className={`px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border transition-all text-center
-                      ${item.actif
-                        ? 'border-orange-200 text-orange-600 hover:bg-orange-50'
-                        : 'border-green-200 text-green-600 hover:bg-green-50'}`}>
-                    {item.actif ? '🙈 Masquer' : '✅ Publier'}
-                  </button>
-                  <button onClick={() => handleDelete(item.id)}
-                    className="px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-all">
-                    🗑️ Supprimer
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 const TABS = [
   { key: 'dashboard',   icon: '📊', label: 'Dashboard'  },
   { key: 'devis',       icon: '📋', label: 'Devis'      },
