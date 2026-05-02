@@ -780,96 +780,10 @@ function ActualitesTab({ token }) {
 
           <button type="submit" disabled={submitting}
             className="w-full sm:w-auto px-8 py-3.5 bg-blue-deslud hover:bg-blue-deslud-2 text-white font-display font-bold text-base uppercase tracking-wide rounded-xl transition-all disabled:opacity-60">
-            {submitting ? '⏳ Publication...' : '📰 Publier l\'actualité'}
-          </button>
-        </form>
-      </div>
 
-      {/* ── Liste des actualités ── 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-display font-bold text-base text-navy uppercase tracking-[0.05em]">
-            Actualités publiées
-          </h3>
-          <span className="text-xs text-gray-400">{items.length} au total</span>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12 text-gray-400">Chargement…</div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            <div className="text-4xl mb-3">📰</div>
-            <div className="font-display font-bold uppercase text-sm">Aucune actualité publiée</div>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-50">
-            {items.map(item => (
-              <div key={item.id} className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-4 ${!item.actif ? 'opacity-50' : ''}`}>
-
-                {/* Miniature 
-                {item.media_url && (
-                  <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                    {item.media_type === 'video'
-                      ? <div className="w-full h-full flex items-center justify-center bg-navy text-white text-2xl">▶</div>
-                      : <img src={item.media_url} alt="" className="w-full h-full object-cover" onError={e => e.target.parentElement.style.display='none'} />
-                    }
-                  </div>
-                )}
-
-                {/* Contenu 
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    {item.categorie && (
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-full">
-                        {item.categorie}
-                      </span>
-                    )}
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${item.actif ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {item.actif ? '✅ Visible' : '🙈 Masquée'}
-                    </span>
-                  </div>
-                  {item.titre && (
-                    <div className="font-display font-black text-base text-navy uppercase leading-tight mb-1">
-                      {item.titre}
-                    </div>
-                  )}
-                  {item.texte && (
-                    <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{item.texte}</p>
-                  )}
-                  <div className="text-[11px] text-gray-300 mt-2">
-                    📅 {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </div>
-                </div>
-
-                {/* Actions 
-                <div className="flex sm:flex-col gap-2 flex-shrink-0">
-                  <button onClick={() => handleToggle(item.id)}
-                    className={`px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border transition-all text-center
-                      ${item.actif
-                        ? 'border-orange-200 text-orange-600 hover:bg-orange-50'
-                        : 'border-green-200 text-green-600 hover:bg-green-50'}`}>
-                    {item.actif ? '🙈 Masquer' : '✅ Publier'}
-                  </button>
-                  <button onClick={() => handleDelete(item.id)}
-                    className="px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-all">
-                    🗑️ Supprimer
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
   );
                       }*/}
-const TABS = [
-  { key: 'dashboard',   icon: '📊', label: 'Dashboard'  },
-  { key: 'devis',       icon: '📋', label: 'Devis'      },
-  { key: 'contacts',    icon: '📬', label: 'Contacts'   },
-  { key: 'temoignages', icon: '⭐', label: 'Avis'       },
-  { key: 'actualites',  icon: '📰', label: 'Actualités' },
-];
+
 
 export default function Admin() {
   const [token, setToken] = useState(() => sessionStorage.getItem('deslud_token'));
