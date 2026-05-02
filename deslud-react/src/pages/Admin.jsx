@@ -494,7 +494,7 @@ function ActualitesTab({ token }) {
                   </div>
                 )}
 
-                {/* Contenu */}
+                {/* Contenu 
 function ActualitesTab({ token }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -654,7 +654,7 @@ function ActualitesTab({ token }) {
                       : <img src={item.media_url} alt="" className="w-full h-full object-cover" onError={e => e.target.parentElement.style.display='none'} />
                     }
                   </div>
-                )}
+                )}*/}
 function ActualitesTab({ token }) {
   const [items, setItems]       = useState([]);
   const [loading, setLoading]   = useState(true);
