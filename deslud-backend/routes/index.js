@@ -91,6 +91,20 @@ router.post('/temoignages', temoignageRules, validate, createTemoignage);
 // --- Newsletter ---
 router.post('/newsletter', newsletterRules, validate, subscribeNewsletter);
 
+
+// ── Actualités (public) ──
+router.get('/actualites', (req, res, next) => {
+  try {
+    const db = getDb();
+    const items = db.prepare(`
+      SELECT * FROM actualites
+      WHERE actif = 1
+      ORDER BY created_at DESC
+      LIMIT 20
+    `).all();
+    res.json({ success: true, data: items });
+  } catch (error) { next(error); }
+});
 // ============================================================
 // 🔐 ROUTES ADMIN — Authentification
 // ============================================================
