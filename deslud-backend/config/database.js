@@ -161,6 +161,21 @@ const initializeSchema = () => {
     )
   `);
 
+  // Table: actualites
+database.exec(`
+  CREATE TABLE IF NOT EXISTS actualites (
+    id TEXT PRIMARY KEY,
+    titre TEXT,
+    texte TEXT,
+    media_url TEXT,
+    media_type TEXT DEFAULT 'image' CHECK(media_type IN ('image', 'video', 'texte')),
+    categorie TEXT,
+    actif INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
   console.log('✅ Schema de base de données initialisé avec succès');
 };
 
