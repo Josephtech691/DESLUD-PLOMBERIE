@@ -24,7 +24,8 @@ app.use(helmet({
 }));
 
 // CORS — Origines autorisées
-const allowedOrigins = (process.env.ALLOWED_ORIGINS).split(',');
+// ✅ Après
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',');
 app.use(cors({
   origin: (origin, callback) => {
     // Autoriser les requêtes sans origin (ex: Postman, mobile)
