@@ -1,45 +1,36 @@
 // config/database.js
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
+const { Pool } = require('pg');
 
-const DB_DIR = path.join(__dirname, '../database');
-const DB_PATH = process.env.DB_PATH || path.join(DB_DIR, 'deslud.db');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
-// Créer le dossier database s'il n'existe pas
-if (!fs.existsSync(DB_DIR)) {
-  fs.mkdirSync(DB_DIR, { recursive: true });
-}
-
-let db;
-
-const getDb = () => {
-  if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma('journal_mode = WAL');
-    db.pragma('foreign_keys = ON');
+const query = async (text, params = []) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(text, params);
+    return result;
+  } finally {
+    client.release();
   }
-  return db;
 };
-const initializeSchema = () => {
-  const database = getDb();
 
-  // Table: utilisateurs (admins)
-  database.exec(`
+const initializeSchema = async () => {
+  await query(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       nom TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
-      role TEXT DEFAULT 'admin' CHECK(role IN ('admin', 'super_admin')),
+      role TEXT DEFAULT 'admin',
       actif INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: contacts (messages du formulaire de contact)
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS contacts (
       id TEXT PRIMARY KEY,
       nom TEXT NOT NULL,
@@ -48,15 +39,14 @@ const initializeSchema = () => {
       telephone TEXT NOT NULL,
       sujet TEXT,
       message TEXT NOT NULL,
-      statut TEXT DEFAULT 'nouveau' CHECK(statut IN ('nouveau', 'lu', 'traite', 'archive')),
+      statut TEXT DEFAULT 'nouveau',
       ip_address TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: devis (demandes de devis)
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS devis (
       id TEXT PRIMARY KEY,
       reference TEXT UNIQUE NOT NULL,
@@ -67,45 +57,41 @@ const initializeSchema = () => {
       adresse TEXT,
       quartier TEXT,
       ville TEXT DEFAULT 'Yaoundé',
-      type_service TEXT NOT NULL CHECK(type_service IN ('installation', 'entretien', 'depannage_rapide', 'autre')),
+      type_service TEXT NOT NULL,
       description TEXT NOT NULL,
-      urgence TEXT DEFAULT 'normal' CHECK(urgence IN ('normal', 'urgent', 'tres_urgent')),
+      urgence TEXT DEFAULT 'normal',
       disponibilite TEXT,
       budget_estime TEXT,
-      statut TEXT DEFAULT 'en_attente' CHECK(statut IN ('en_attente', 'en_cours', 'devis_envoye', 'accepte', 'refuse', 'termine')),
+      statut TEXT DEFAULT 'en_attente',
       montant_devis REAL,
       notes_admin TEXT,
       admin_id TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (admin_id) REFERENCES users(id)
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: interventions (suivi des interventions)
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS interventions (
       id TEXT PRIMARY KEY,
       devis_id TEXT,
       technicien TEXT,
-      date_intervention DATETIME,
+      date_intervention TIMESTAMP,
       duree_heures REAL,
       description_travaux TEXT,
       materiel_utilise TEXT,
       cout_main_oeuvre REAL,
       cout_materiel REAL,
       cout_total REAL,
-      statut TEXT DEFAULT 'planifie' CHECK(statut IN ('planifie', 'en_cours', 'termine', 'annule')),
+      statut TEXT DEFAULT 'planifie',
       rapport TEXT,
-      satisfaction_client INTEGER CHECK(satisfaction_client BETWEEN 1 AND 5),
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (devis_id) REFERENCES devis(id)
+      satisfaction_client INTEGER,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: services (services proposés)
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS services (
       id TEXT PRIMARY KEY,
       nom TEXT NOT NULL,
@@ -117,38 +103,35 @@ const initializeSchema = () => {
       prix_a_partir REAL,
       actif INTEGER DEFAULT 1,
       ordre INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: temoignages (avis clients)
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS temoignages (
       id TEXT PRIMARY KEY,
       nom_client TEXT NOT NULL,
       quartier TEXT,
-      note INTEGER NOT NULL CHECK(note BETWEEN 1 AND 5),
+      note INTEGER NOT NULL,
       commentaire TEXT NOT NULL,
       service_type TEXT,
       valide INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: newsletter / abonnés
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS newsletter (
       id TEXT PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
       actif INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: logs (journal des actions)
-  database.exec(`
+  await query(`
     CREATE TABLE IF NOT EXISTS logs (
       id TEXT PRIMARY KEY,
       action TEXT NOT NULL,
@@ -157,26 +140,49 @@ const initializeSchema = () => {
       user_id TEXT,
       details TEXT,
       ip_address TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Table: actualites
-database.exec(`
-  CREATE TABLE IF NOT EXISTS actualites (
-    id TEXT PRIMARY KEY,
-    titre TEXT,
-    texte TEXT,
-    media_url TEXT,
-    media_type TEXT DEFAULT 'image' CHECK(media_type IN ('image', 'video', 'texte')),
-    categorie TEXT,
-    actif INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
+  await query(`
+    CREATE TABLE IF NOT EXISTS actualites (
+      id TEXT PRIMARY KEY,
+      titre TEXT,
+      texte TEXT,
+      media_url TEXT,
+      media_type TEXT DEFAULT 'texte',
+      categorie TEXT,
+      actif INTEGER DEFAULT 1,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 
-  console.log('✅ Schema de base de données initialisé avec succès');
+  console.log('✅ Schéma PostgreSQL initialisé');
 };
 
+// Compatibilité avec l'ancien code SQLite — simule .get() et .all()
+const db = {
+  prepare: (text) => ({
+    // Retourne un seul résultat
+    get: async (...params) => {
+      const r = await query(text, params);
+      return r.rows[0] || null;
+    },
+    // Retourne tous les résultats
+    all: async (...params) => {
+      const r = await query(text, params);
+      return r.rows;
+    },
+    // Exécute sans retour (INSERT, UPDATE, DELETE)
+    run: async (...params) => {
+      const r = await query(text, params);
+      return { changes: r.rowCount };
+    },
+  }),
+  // Pour les requêtes directes
+  exec: async (text) => { await query(text); },
+};
+
+module.exports = { query, initializeSchema, pool };
 module.exports = { getDb, initializeSchema };
