@@ -122,54 +122,56 @@ app.use(errorHandler);
 // ============================================================
 // ── Auto-initialisation des données de base ──────────────────
 const autoSeed = async () => {
-  const { getDb } = require('./config/database');
+  const { query } = require('./config/database');
   const bcrypt = require('bcryptjs');
   const { v4: uuidv4 } = require('uuid');
-  const db = getDb();
 
-  // ── Admin par défaut ──────────────────────────────────────
-  const adminEmail = process.env.ADMIN_EMAIL;
+  // Admin
+  const adminEmail    = process.env.ADMIN_EMAIL ;
   const adminPassword = process.env.ADMIN_PASSWORD;
-  const existingAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
 
-  if (!existingAdmin) {
+  const existingAdmin = await query('SELECT id FROM users WHERE email = $1', [adminEmail]);
+  if (existingAdmin.rows.length === 0) {
     const hashed = bcrypt.hashSync(adminPassword, 12);
-    db.prepare(`
-      INSERT INTO users (id, nom, email, password, role, actif)
-      VALUES (?, ?, ?, ?, ?, 1)
-    `).run(uuidv4(), 'Super Admin', adminEmail, hashed, 'super_admin');
+    await query(
+      'INSERT INTO users (id, nom, email, password, role, actif) VALUES ($1,$2,$3,$4,$5,$6)',
+      [uuidv4(), 'Super Admin', adminEmail, hashed, 'super_admin', 1]
+    );
     console.log('✅ Admin créé:', adminEmail);
   }
 
-  // ── Services ──────────────────────────────────────────────
+  // Services
   const services = [
-    { nom: 'Installation Sanitaire',  slug: 'installation-sanitaire', description: 'Installation complète de vos équipements sanitaires par des techniciens qualifiés.', prix: 15000, ordre: 1 },
-    { nom: 'Entretien & Maintenance', slug: 'entretien-maintenance',  description: 'Entretien régulier et maintenance préventive de vos installations.',               prix: 10000, ordre: 2 },
-    { nom: 'Dépannage Rapide',        slug: 'depannage-rapide',       description: 'Intervention d\'urgence rapide 7j/7, 24h/24 partout à Yaoundé.',                   prix: 5000,  ordre: 3 },
-    { nom: 'Dépannage de Fuites',     slug: 'depannage-fuites',       description: 'Détection et réparation de fuites visibles ou cachées.',                           prix: 8000,  ordre: 4 },
-    { nom: 'Réparation Tuyauterie',   slug: 'reparation-tuyauterie',  description: 'Réparation et remplacement de tuyaux — PVC, acier, cuivre, PER.',                  prix: 12000, ordre: 5 },
+    { nom: 'Installation Sanitaire',  slug: 'installation-sanitaire', description: 'Installation complète de vos équipements sanitaires.', prix: 15000, ordre: 1 },
+    { nom: 'Entretien & Maintenance', slug: 'entretien-maintenance',  description: 'Entretien régulier et maintenance préventive.',        prix: 10000, ordre: 2 },
+    { nom: 'Dépannage Rapide',        slug: 'depannage-rapide',       description: 'Intervention d\'urgence 7j/7.',                       prix: 5000,  ordre: 3 },
+    { nom: 'Dépannage de Fuites',     slug: 'depannage-fuites',       description: 'Détection et réparation de fuites.',                  prix: 8000,  ordre: 4 },
+    { nom: 'Réparation Tuyauterie',   slug: 'reparation-tuyauterie',  description: 'Réparation de tous types de tuyaux.',                 prix: 12000, ordre: 5 },
   ];
 
-  services.forEach(s => {
-    db.prepare(`
-      INSERT OR IGNORE INTO services (id, nom, slug, description, prix_a_partir, actif, ordre)
-      VALUES (?, ?, ?, ?, ?, 1, ?)
-    `).run(uuidv4(), s.nom, s.slug, s.description, s.prix, s.ordre);
-  });
+  for (const s of services) {
+    await query(
+      'INSERT INTO services (id, nom, slug, description, prix_a_partir, actif, ordre) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (slug) DO NOTHING',
+      [uuidv4(), s.nom, s.slug, s.description, s.prix, 1, s.ordre]
+    );
+  }
 
-  // ── Témoignages ───────────────────────────────────────────
+  // Témoignages
   const temoignages = [
-    { nom: 'Marie Atangana',   quartier: 'Bastos',   note: 5, commentaire: 'Service impeccable ! Travail propre et soigné. Je recommande fortement !',    service: 'depannage_rapide' },
-    { nom: 'Paul Mbarga',      quartier: 'Nlongkak', note: 5, commentaire: 'Excellente prestation pour l\'installation de ma nouvelle salle de bain.',     service: 'installation'     },
-    { nom: 'Sophie Ngo Biyong',quartier: 'Melen',    note: 4, commentaire: 'Très bon service, intervention rapide le dimanche pour une urgence.',          service: 'depannage_rapide' },
+    { nom: 'Marie Atangana',    quartier: 'Bastos',   note: 5, commentaire: 'Service impeccable !',                         service: 'depannage_rapide' },
+    { nom: 'Paul Mbarga',       quartier: 'Nlongkak', note: 5, commentaire: 'Excellente prestation pour mon installation.', service: 'installation'     },
+    { nom: 'Sophie Ngo Biyong', quartier: 'Melen',    note: 4, commentaire: 'Très bon service, intervention rapide.',       service: 'depannage_rapide' },
   ];
 
-  temoignages.forEach(t => {
-    db.prepare(`
-      INSERT OR IGNORE INTO temoignages (id, nom_client, quartier, note, commentaire, service_type, valide)
-      VALUES (?, ?, ?, ?, ?, ?, 1)
-    `).run(uuidv4(), t.nom, t.quartier, t.note, t.commentaire, t.service);
-  });
+  for (const t of temoignages) {
+    const ex = await query('SELECT id FROM temoignages WHERE nom_client = $1', [t.nom]);
+    if (ex.rows.length === 0) {
+      await query(
+        'INSERT INTO temoignages (id, nom_client, quartier, note, commentaire, service_type, valide) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+        [uuidv4(), t.nom, t.quartier, t.note, t.commentaire, t.service, 1]
+      );
+    }
+  }
 };
 const startServer = async () => {
   try {
