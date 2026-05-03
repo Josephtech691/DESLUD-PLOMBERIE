@@ -1,5 +1,5 @@
 // src/pages/Admin.jsx
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import SEO from '../components/ui/SEO';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -335,13 +335,17 @@ function TemoignagesTab({ token }) {
 }
 
 function ActualitesTab({ token }) {
-  const [items, setItems]       = useState([]);
-  const [loading, setLoading]   = useState(true);
+  const [items, setItems]         = useState([]);
+  const [loading, setLoading]     = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [msg, setMsg]           = useState(null);
-  const [form, setForm]         = useState({
+  const [msg, setMsg]             = useState(null);
+  const [preview, setPreview]     = useState(null);
+  const [fileType, setFileType]   = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [form, setForm] = useState({
     titre: '', texte: '', media_url: '', media_type: 'texte', categorie: '',
   });
+  const fileInputRef = useRef(null);
 
   const load = () => {
     setLoading(true);
@@ -351,8 +355,101 @@ function ActualitesTab({ token }) {
 
   useEffect(load, [token]);
 
+  // ── Compression image via canvas ──────────────────────────
+  const compressImage = (file, maxWidth = 1200, quality = 0.75) =>
+    new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+  // ── Conversion vidéo en base64 ────────────────────────────
+  const videoToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      // Limite 50 Mo pour les vidéos
+      if (file.size > 50 * 1024 * 1024) {
+        reject(new Error('Vidéo trop lourde. Maximum 50 Mo.'));
+        return;
+      }
+      const reader = new FileReader();
+      let last = 0;
+      reader.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          if (pct !== last) { last = pct; setUploadProgress(pct); }
+        }
+      };
+      reader.onload = (e) => { setUploadProgress(100); resolve(e.target.result); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  // ── Gestion du fichier sélectionné ───────────────────────
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setMsg(null);
+    setUploadProgress(0);
+
+    const isImg = file.type.startsWith('image/');
+    const isVid = file.type.startsWith('video/');
+
+    if (!isImg && !isVid) {
+      setMsg({ type: 'error', text: '❌ Format non supporté. Choisissez une image ou une vidéo.' });
+      return;
+    }
+
+    try {
+      setMsg({ type: 'info', text: '⏳ Traitement du fichier en cours...' });
+
+      let base64;
+      if (isImg) {
+        base64 = await compressImage(file);
+        setFileType('image');
+        setForm(p => ({ ...p, media_url: base64, media_type: 'image' }));
+      } else {
+        base64 = await videoToBase64(file);
+        setFileType('video');
+        setForm(p => ({ ...p, media_url: base64, media_type: 'video' }));
+      }
+
+      setPreview(base64);
+      setMsg({ type: 'success', text: `✅ ${isImg ? 'Photo' : 'Vidéo'} prête à publier !` });
+    } catch (err) {
+      setMsg({ type: 'error', text: `❌ ${err.message || 'Erreur lors du chargement du fichier.'}` });
+    }
+  };
+
+  // ── Supprimer le fichier sélectionné ─────────────────────
+  const removeFile = () => {
+    setPreview(null);
+    setFileType(null);
+    setUploadProgress(0);
+    setForm(p => ({ ...p, media_url: '', media_type: 'texte' }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setMsg(null);
+  };
+
+  // ── Soumettre ─────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.titre && !form.texte && !form.media_url) {
+      setMsg({ type: 'error', text: '❌ Ajoutez au moins un titre, un texte ou un média.' });
+      return;
+    }
     setSubmitting(true);
     setMsg(null);
     try {
@@ -363,6 +460,10 @@ function ActualitesTab({ token }) {
       if (j.success) {
         setMsg({ type: 'success', text: '✅ ' + j.message });
         setForm({ titre: '', texte: '', media_url: '', media_type: 'texte', categorie: '' });
+        setPreview(null);
+        setFileType(null);
+        setUploadProgress(0);
+        if (fileInputRef.current) fileInputRef.current.value = '';
         load();
       } else {
         setMsg({ type: 'error', text: '❌ ' + j.message });
@@ -390,19 +491,25 @@ function ActualitesTab({ token }) {
         Gestion des actualités
       </h2>
 
-      {/* ── Formulaire création ── */}
+      {/* ── Formulaire ── */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-7">
         <h3 className="font-display font-bold text-lg text-navy uppercase tracking-[0.05em] mb-5">
           📰 Publier une actualité
         </h3>
 
+        {/* Message */}
         {msg && (
-          <div className={`px-4 py-3 rounded-xl text-sm font-medium mb-5 ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+          <div className={`px-4 py-3 rounded-xl text-sm font-medium mb-5 flex items-center gap-2
+            ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            : msg.type === 'error'   ? 'bg-red-50 text-red-600 border border-red-200'
+            :                          'bg-blue-50 text-blue-600 border border-blue-200'}`}>
             {msg.text}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* Titre + Catégorie */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Titre</label>
@@ -416,50 +523,96 @@ function ActualitesTab({ token }) {
             </div>
           </div>
 
+          {/* Texte */}
           <div>
             <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Texte / Description</label>
             <textarea value={form.texte} onChange={e => setForm(p => ({ ...p, texte: e.target.value }))}
-              placeholder="Décrivez votre actualité en détail..." rows={4}
-              className={`${inp} resize-y min-h-[100px]`} />
+              placeholder="Décrivez votre actualité..." rows={3}
+              className={`${inp} resize-y min-h-[90px]`} />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="sm:col-span-2">
-              <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">
-                URL de la photo / vidéo <span className="font-normal text-gray-300">(optionnel)</span>
+          {/* Zone upload fichier */}
+          <div>
+            <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">
+              Photo ou vidéo <span className="font-normal text-gray-300">(optionnel)</span>
+            </label>
+
+            {/* Pas encore de fichier → zone de dépôt */}
+            {!preview ? (
+              <label className="flex flex-col items-center justify-center gap-3 w-full h-40 bg-gray-50 border-2 border-dashed border-gray-200 hover:border-blue-deslud hover:bg-blue-deslud/5 rounded-2xl cursor-pointer transition-all group">
+                <div className="text-4xl group-hover:scale-110 transition-transform">📷</div>
+                <div className="text-center">
+                  <div className="font-display font-bold text-sm text-gray-500 uppercase tracking-wide group-hover:text-blue-deslud transition-colors">
+                    Choisir une photo ou vidéo
+                  </div>
+                  <div className="text-xs text-gray-300 mt-1">
+                    JPG, PNG, GIF, MP4, MOV • Vidéo max 50 Mo
+                  </div>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
               </label>
-              <input value={form.media_url} onChange={e => setForm(p => ({ ...p, media_url: e.target.value }))}
-                placeholder="https://... (lien vers image ou vidéo)" className={inp} />
-              <p className="text-[11px] text-gray-300 mt-1.5">
-                💡 Uploadez votre photo sur <strong>imgbb.com</strong> ou <strong>cloudinary.com</strong> gratuitement, puis collez le lien ici.
-              </p>
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-[0.12em] text-gray-400 block mb-1.5">Type de média</label>
-              <select value={form.media_type} onChange={e => setForm(p => ({ ...p, media_type: e.target.value }))} className={inp}>
-                <option value="texte">📝 Texte seulement</option>
-                <option value="image">🖼️ Image</option>
-                <option value="video">🎥 Vidéo</option>
-              </select>
-            </div>
+            ) : (
+              /* Aperçu du fichier sélectionné */
+              <div className="border border-gray-100 rounded-2xl overflow-hidden">
+                {/* Header aperçu */}
+                <div className="px-4 py-3 bg-gray-50 flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wide text-gray-400">
+                    {fileType === 'video' ? '🎥 Vidéo sélectionnée' : '🖼️ Photo sélectionnée'}
+                  </span>
+                  <button type="button" onClick={removeFile}
+                    className="text-xs font-bold text-red-400 hover:text-red-600 uppercase tracking-wide transition-colors flex items-center gap-1">
+                    🗑️ Supprimer
+                  </button>
+                </div>
+
+                {/* Barre de progression (pendant chargement vidéo) */}
+                {fileType === 'video' && uploadProgress < 100 && (
+                  <div className="px-4 py-3 bg-blue-50">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-blue-600">Chargement de la vidéo...</span>
+                      <span className="text-xs font-bold text-blue-600">{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-blue-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-deslud rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Aperçu image ou vidéo */}
+                <div className="bg-black">
+                  {fileType === 'video'
+                    ? <video src={preview} controls className="w-full max-h-64 object-contain" />
+                    : <img src={preview} alt="Aperçu" className="w-full max-h-64 object-contain" />
+                  }
+                </div>
+
+                {/* Changer le fichier */}
+                <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
+                  <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-deslud hover:text-blue-deslud-2 uppercase tracking-wide transition-colors">
+                    📁 Choisir un autre fichier
+                    <input type="file" accept="image/*,video/*" capture="environment"
+                      className="hidden" onChange={handleFileChange} />
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Prévisualisation media */}
-          {form.media_url && (
-            <div className="border border-gray-100 rounded-xl overflow-hidden">
-              <div className="px-4 py-2 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-400">Prévisualisation</div>
-              <div className="p-3">
-                {form.media_type === 'video'
-                  ? <video src={form.media_url} controls className="w-full max-h-48 rounded-lg object-contain bg-black" />
-                  : <img src={form.media_url} alt="preview" className="w-full max-h-48 rounded-lg object-cover" onError={e => e.target.style.display='none'} />
-                }
-              </div>
-            </div>
-          )}
-
+          {/* Bouton publier */}
           <button type="submit" disabled={submitting}
-            className="w-full sm:w-auto px-8 py-3.5 bg-blue-deslud hover:bg-blue-deslud-2 text-white font-display font-bold text-base uppercase tracking-wide rounded-xl transition-all disabled:opacity-60">
-            {submitting ? '⏳ Publication...' : '📰 Publier l\'actualité'}
+            className="w-full sm:w-auto px-8 py-4 bg-blue-deslud hover:bg-blue-deslud-2 text-white font-display font-bold text-base uppercase tracking-wide rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+            {submitting
+              ? <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg> Publication...</>
+              : '📰 Publier l\'actualité'
+            }
           </button>
         </form>
       </div>
@@ -478,19 +631,21 @@ function ActualitesTab({ token }) {
         ) : items.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <div className="text-4xl mb-3">📰</div>
-            <div className="font-display font-bold uppercase text-sm">Aucune actualité publiée</div>
+            <div className="font-display font-bold uppercase text-sm">Aucune actualité</div>
+            <div className="text-xs mt-1">Publiez votre première actualité ci-dessus</div>
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
             {items.map(item => (
-              <div key={item.id} className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-4 ${!item.actif ? 'opacity-50' : ''}`}>
+              <div key={item.id} className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-4 transition-opacity ${!item.actif ? 'opacity-40' : ''}`}>
 
                 {/* Miniature */}
                 {item.media_url && (
                   <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                     {item.media_type === 'video'
-                      ? <div className="w-full h-full flex items-center justify-center bg-navy text-white text-2xl">▶</div>
-                      : <img src={item.media_url} alt="" className="w-full h-full object-cover" onError={e => e.target.parentElement.style.display='none'} />
+                      ? <video src={item.media_url} className="w-full h-full object-cover" muted playsInline />
+                      : <img src={item.media_url} alt="" className="w-full h-full object-cover"
+                          onError={e => e.target.parentElement.style.display = 'none'} />
                     }
                   </div>
                 )}
@@ -503,9 +658,15 @@ function ActualitesTab({ token }) {
                         {item.categorie}
                       </span>
                     )}
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${item.actif ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full
+                      ${item.actif ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                       {item.actif ? '✅ Visible' : '🙈 Masquée'}
                     </span>
+                    {item.media_type !== 'texte' && (
+                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">
+                        {item.media_type === 'video' ? '🎥 Vidéo' : '🖼️ Photo'}
+                      </span>
+                    )}
                   </div>
                   {item.titre && (
                     <div className="font-display font-black text-base text-navy uppercase leading-tight mb-1">
@@ -516,21 +677,23 @@ function ActualitesTab({ token }) {
                     <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{item.texte}</p>
                   )}
                   <div className="text-[11px] text-gray-300 mt-2">
-                    📅 {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    📅 {new Date(item.created_at).toLocaleDateString('fr-FR', {
+                      day: '2-digit', month: 'long', year: 'numeric'
+                    })}
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex sm:flex-col gap-2 flex-shrink-0">
                   <button onClick={() => handleToggle(item.id)}
-                    className={`px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border transition-all text-center
+                    className={`px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border transition-all text-center whitespace-nowrap
                       ${item.actif
                         ? 'border-orange-200 text-orange-600 hover:bg-orange-50'
                         : 'border-green-200 text-green-600 hover:bg-green-50'}`}>
                     {item.actif ? '🙈 Masquer' : '✅ Publier'}
                   </button>
                   <button onClick={() => handleDelete(item.id)}
-                    className="px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-all">
+                    className="px-3 py-2 font-display font-bold text-xs uppercase tracking-wide rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-all whitespace-nowrap">
                     🗑️ Supprimer
                   </button>
                 </div>
