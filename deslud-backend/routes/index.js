@@ -37,6 +37,31 @@ const {
   loginRules, adminCreateRules, temoignageRules, newsletterRules, uuidParam
 } = require('../middleware/validation');
 
+
+const { query } = require('../config/database');
+
+// Convertit les ? SQLite en $1,$2... PostgreSQL
+const pgQuery = (text, params = []) => {
+  let i = 0;
+  const pgText = text.replace(/\?/g, () => `$${++i}`);
+  return query(pgText, params);
+};
+
+// Simule db.prepare().get() / .all() / .run() en mode async
+const db = {
+  get: async (text, ...params) => {
+    const r = await pgQuery(text, params.flat());
+    return r.rows[0] || null;
+  },
+  all: async (text, ...params) => {
+    const r = await pgQuery(text, params.flat());
+    return r.rows;
+  },
+  run: async (text, ...params) => {
+    const r = await pgQuery(text, params.flat());
+    return { changes: r.rowCount };
+  },
+};
 // ============================================================
 // 🌐 ROUTES PUBLIQUES
 // ============================================================
