@@ -173,32 +173,20 @@ const autoSeed = async () => {
 };
 const startServer = async () => {
   try {
-    // Initialiser le schéma
-    initializeSchema();
+    await initializeSchema();
     console.log('✅ Schéma base de données OK');
 
-    // Auto-seed : créer admin + données de base si inexistants
     await autoSeed();
     console.log('✅ Données initiales OK');
 
     app.listen(PORT, () => {
-      console.log('\n══════════════════════════════════════════════════');
-      console.log('   💧 DESLUD PLOMBERIE — API Backend');
-      console.log('══════════════════════════════════════════════════');
-      console.log(`   🌐 URL:        http://localhost:${PORT}`);
-      console.log(`   📌 Env:        ${process.env.NODE_ENV || 'development'}`);
-      console.log(`   📋 Health:     http://localhost:${PORT}/api/health`);
-      console.log(`   📊 Dashboard:  http://localhost:${PORT}/api/admin/dashboard`);
-      console.log('══════════════════════════════════════════════════');
-      console.log('\n⚠️  Pour initialiser la DB avec des données:');
-      console.log('   cd config && node initDb.js\n');
+      console.log(`🚀 Serveur démarré sur le port ${PORT}`);
     });
   } catch (error) {
-    console.error('❌ Impossible de démarrer le serveur:', error);
+    console.error('❌ Impossible de démarrer:', error);
     process.exit(1);
   }
 };
-
 // Gestion des erreurs non catchées
 process.on('unhandledRejection', (reason) => {
   console.error('❌ Unhandled Rejection:', reason);
