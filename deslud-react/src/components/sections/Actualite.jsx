@@ -9,8 +9,14 @@ const formatDate = (dateStr, lang) =>
     day: '2-digit', month: 'long', year: 'numeric',
   });
 
-const isVideo = (url) => url && /\.(mp4|webm|ogg|mov)$/i.test(url);
-const isImage = (url) => url && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+const isVideo = (url) => url && (
+  /\.(mp4|webm|ogg|mov)$/i.test(url) ||
+  url.startsWith('data:video/')
+);
+const isImage = (url) => url && (
+  /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
+  url.startsWith('data:image/')
+);
 
 export default function Actualites() {
   const { lang } = useLang();
