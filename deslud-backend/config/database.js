@@ -185,4 +185,3 @@ const db = {
 };
 
 module.exports = { query, initializeSchema, pool };
-module.exports = { getDb, initializeSchema };
