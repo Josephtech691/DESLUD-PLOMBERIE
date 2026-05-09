@@ -175,37 +175,26 @@ const autoSeed = async () => {
   }
 };
 const startServer = async () => {
-  try {
-    await initializeSchema();
-    console.log('✅ Schéma base de données OK');
+  // ── 1. Démarrer le serveur IMMÉDIATEMENT (Render détecte le port)
+  app.listen(PORT, () => {
+    console.log('══════════════════════════════════════');
+    console.log(`💧 DESLUD PLOMBERIE — Port ${PORT} ouvert`);
+    console.log('══════════════════════════════════════');
+  });
 
+  // ── 2. Initialiser la base de données en arrière-plan
+  try {
+    console.log('⏳ Connexion à la base de données...');
+    await initializeSchema();
+    console.log('✅ Schéma OK');
     await autoSeed();
     console.log('✅ Données initiales OK');
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-    });
+    console.log('✅ Serveur 100% opérationnel');
   } catch (error) {
-    console.error('❌ Impossible de démarrer:', error);
-    process.exit(1);
+    console.error('❌ Erreur base de données:', error.message);
+    console.error('❌ Stack:', error.stack);
   }
 };
-// Gestion des erreurs non catchées
-process.on('unhandledRejection', (reason) => {
-  console.error('❌ Unhandled Rejection:', reason);
-});
-
-process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
-  process.exit(1);
-});
-
-// Arrêt propre
-process.on('SIGTERM', () => {
-  console.log('\n🛑 Arrêt du serveur...');
-  process.exit(0);
-});
-
 startServer();
 
 module.exports = app;
