@@ -161,27 +161,37 @@ const initializeSchema = async () => {
   console.log('✅ Schéma PostgreSQL initialisé');
 };
 
-// Compatibilité avec l'ancien code SQLite — simule .get() et .all()
-const db = {
+// ── Compatibilité avec l'ancien code SQLite ──────────────
+// Permet d'utiliser db.prepare('...').get() / .all() / .run()
+// sans modifier tous les controllers existants
+
+const getDb = () => ({
   prepare: (text) => ({
-    // Retourne un seul résultat
     get: async (...params) => {
-      const r = await query(text, params);
+      const flat = params.flat();
+      let i = 0;
+      const pgText = text.replace(/\?/g, () => `$${++i}`);
+      const r = await pool.query(pgText, flat);
       return r.rows[0] || null;
     },
-    // Retourne tous les résultats
     all: async (...params) => {
-      const r = await query(text, params);
+      const flat = params.flat();
+      let i = 0;
+      const pgText = text.replace(/\?/g, () => `$${++i}`);
+      const r = await pool.query(pgText, flat);
       return r.rows;
     },
-    // Exécute sans retour (INSERT, UPDATE, DELETE)
     run: async (...params) => {
-      const r = await query(text, params);
+      const flat = params.flat();
+      let i = 0;
+      const pgText = text.replace(/\?/g, () => `$${++i}`);
+      const r = await pool.query(pgText, flat);
       return { changes: r.rowCount };
     },
   }),
-  // Pour les requêtes directes
-  exec: async (text) => { await query(text); },
-};
+  exec: async (text) => {
+    await pool.query(text);
+  },
+});
 
-module.exports = { query, initializeSchema, pool };
+module.exports = { query, initializeSchema, pool, getDb };
