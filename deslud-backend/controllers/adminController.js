@@ -9,23 +9,33 @@ const { getDb } = require('../config/database');
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const db = getDb();
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ? AND actif = 1').get(email);
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Email ou mot de passe incorrect.'
-      });
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email et mot de passe requis.' });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Email ou mot de passe incorrect.'
-      });
+    // Sélectionner explicitement le champ password
+    const result = await query(
+      'SELECT id, nom, email, password, role, actif FROM users WHERE email=$1',
+      [email]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
+    }
+
+    if (!user.actif) {
+      return res.status(401).json({ success: false, message: 'Compte désactivé.' });
+    }
+
+    if (!user.password) {
+      return res.status(500).json({ success: false, message: 'Erreur compte : mot de passe manquant.' });
+    }
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
     }
 
     const token = jwt.sign(
@@ -34,24 +44,18 @@ const login = async (req, res, next) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 
-    // Log de connexion
-    db.prepare(`
-      INSERT INTO logs (id, action, entite, user_id, ip_address)
-      VALUES (?, 'LOGIN', 'users', ?, ?)
-    `).run(uuidv4(), user.id, req.ip);
+    await query(
+      `INSERT INTO logs (id, action, entite, user_id, ip_address) VALUES ($1, 'LOGIN', 'users', $2, $3)`,
+      [uuidv4(), user.id, req.ip]
+    );
 
     res.json({
       success: true,
       message: `Bienvenue, ${user.nom} !`,
       data: {
         token,
-        user: {
-          id: user.id,
-          nom: user.nom,
-          email: user.email,
-          role: user.role
-        }
-      }
+        user: { id: user.id, nom: user.nom, email: user.email, role: user.role },
+      },
     });
   } catch (error) {
     next(error);
