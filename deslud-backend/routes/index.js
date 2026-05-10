@@ -4,6 +4,12 @@ const router = express.Router();
 
 // ✅ Ces imports doivent être présents
 const { getDb } = require('../config/database');
+// ✅ Ajouter cette ligne
+const { query } = require('../config/database');
+const { v4: uuidv4 } = require('uuid');
+
+const { authenticate, requireSuperAdmin } = require('../middleware/auth');
+const { validate, contactRules, devisRules, devisStatutRules, loginRules, adminCreateRules, temoignageRules, newsletterRules, uuidParam } = require('../middleware/validation');
 
 // ... reste du fichier
 
