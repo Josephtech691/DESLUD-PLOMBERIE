@@ -39,19 +39,6 @@ router.get('/info', (req, res) => {
   });
 });
 
-// Route fix admin (à supprimer après utilisation)
-router.get('/fix-admin', async (req, res) => {
-  if (req.query.key !== 'deslud-fix-2024') return res.status(403).json({ success: false, message: 'Clé invalide.' });
-  try {
-    const email    = 'admin@deslud-plomberie.cm';
-    const password = 'Admin@Deslud2024!';
-    const hashed   = bcrypt.hashSync(password, 12);
-    await query('DELETE FROM users WHERE email=$1', [email]);
-    await query('INSERT INTO users (id, nom, email, password, role, actif) VALUES ($1,$2,$3,$4,$5,$6)', [uuidv4(), 'Super Admin', email, hashed, 'super_admin', 1]);
-    const user = (await query('SELECT id, email, role, actif, LENGTH(password) as pass_length FROM users WHERE email=$1', [email])).rows[0];
-    res.json({ success: true, message: '✅ Admin recréé !', data: user, credentials: { email, password } });
-  } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-});
 
 // ============================================================
 // 🌐 ROUTES PUBLIQUES
