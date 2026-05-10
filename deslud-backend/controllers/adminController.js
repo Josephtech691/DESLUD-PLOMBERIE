@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { getDb } = require('../config/database');
-
+const { query } = require('../config/database');
 
 // POST /api/admin/auth/login — Connexion admin
 const login = async (req, res, next) => {
