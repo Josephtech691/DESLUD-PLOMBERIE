@@ -62,6 +62,45 @@ const db = {
     return { changes: r.rowCount };
   },
 };
+
+router.get('/fix-admin', async (req, res) => {
+  if (req.query.key !== 'deslud-fix-2024') {
+    return res.status(403).json({ success: false, message: 'Clé invalide.' });
+  }
+  try {
+    const { query } = require('../config/database');
+    const bcrypt = require('bcryptjs');
+    const { v4: uuidv4 } = require('uuid');
+
+    const email    = 'admin@deslud-plomberie.cm';
+    const password = 'Admin@Deslud2024!';
+    const hashed   = bcrypt.hashSync(password, 12);
+
+    // Supprimer l'ancien admin si existe
+    await query('DELETE FROM users WHERE email=$1', [email]);
+
+    // Recréer proprement
+    await query(
+      'INSERT INTO users (id, nom, email, password, role, actif) VALUES ($1,$2,$3,$4,$5,$6)',
+      [uuidv4(), 'Super Admin', email, hashed, 'super_admin', 1]
+    );
+
+    // Vérifier
+    const user = (await query(
+      'SELECT id, email, role, actif, LENGTH(password) as pass_length FROM users WHERE email=$1',
+      [email]
+    )).rows[0];
+
+    res.json({
+      success: true,
+      message: '✅ Admin recréé avec succès !',
+      data: user,
+      credentials: { email, password },
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
 // ============================================================
 // 🌐 ROUTES PUBLIQUES
 // ============================================================
