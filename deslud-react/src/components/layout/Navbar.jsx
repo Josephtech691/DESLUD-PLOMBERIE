@@ -115,15 +115,16 @@ export default function Navbar() {
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 flex items-center justify-between h-20">
 
           {/* Logo */}
-          <button onClick={() => handleNav('#hero')} className="flex items-center gap-3">
-            <div ‎className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl shadow-glow-blue flex-shrink-0">
-            <img src="/images/logodeslud.png" alt="DESLUD PLOMBERIE"/>
-            </div>
-            <div className="leading-none hidden sm:block">
-              <div className="font-display text-xl font-black text-white uppercase tracking-[0.05em]">Deslud</div>
-              <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-cyan-deslud">Plomberie</div>
-            </div>
-          </button>
+‎<button onClick={() => handleNav('#hero')} className="flex items-center gap-3">
+‎  <div className="w-36 sm:w-40 flex-shrink-0">
+‎    <img
+‎      src="images/logodeslud.png"
+‎      alt="Deslud Plomberie"
+‎      className="w-full h-auto object-contain"
+‎      style={{ maxHeight: '48px' }}
+‎    />
+‎  </div>
+‎</button>
 
           {/* Desktop links */}
           <ul className="hidden lg:flex items-center gap-1">
