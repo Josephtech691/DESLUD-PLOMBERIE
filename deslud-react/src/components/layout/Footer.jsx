@@ -50,17 +50,19 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/[0.06]">
 
           ‎{/* Brand */}
-‎<div>
-‎  <div className="mb-5">
-‎    <img
-‎      src="logo.png"
-‎      alt="Deslud Plomberie"
-‎      className="h-14 w-auto object-contain brightness-0 invert"
-‎    />
-‎  </div>
-‎  <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
-‎    Service de plomberie rapide, propre et efficace à Yaoundé et dans tout le Cameroun.
-‎  </p>
+<div>
+  <div className="mb-5">
+    <img
+      src="logo.png"
+      alt="Deslud Plomberie"
+      className="h-14 w-auto object-contain brightness-0 invert"
+    />
+  </div>
+
+  <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
+    Service de plomberie rapide, propre et efficace à Yaoundé et dans tout le Cameroun.
+  </p>
+
             <div className="flex flex-col gap-2">
               {contacts.map(({ icon, val, href }) => (
                 href
