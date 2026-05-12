@@ -116,7 +116,9 @@ export default function Navbar() {
 
           {/* Logo */}
           <button onClick={() => handleNav('#hero')} className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-blue-deslud rounded-xl flex items-center justify-center text-2xl shadow-glow-blue flex-shrink-0">💧</div>
+            <div className="w-11 h-11 bg-blue-deslud rounded-xl flex items-center justify-center text-2xl shadow-glow-blue flex-shrink-0">
+            <img src="" alt=""/>
+            </div>
             <div className="leading-none hidden sm:block">
               <div className="font-display text-xl font-black text-white uppercase tracking-[0.05em]">Deslud</div>
               <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-cyan-deslud">Plomberie</div>
