@@ -63,7 +63,22 @@ function LoginForm({ onLogin }) {
     <div className="min-h-screen bg-navy flex items-center justify-center p-4">
       <div className="bg-navy-2 border border-blue-deslud/20 rounded-3xl p-7 sm:p-10 w-full max-w-md shadow-card">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-deslud rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-glow-blue">💧</div>
+          <div className="w-16 h-16 bg-blue-deslud rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-glow-blue">
+          {/* Logo login */}
+<div className="text-center mb-8">
+  <div className="flex justify-center mb-4">
+    <img
+      src="/logo.png"
+      alt="Deslud Plomberie"
+      className="h-16 w-auto object-contain brightness-0 invert"
+    />
+  </div>
+  <h1 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-[0.05em]">
+    Deslud Admin
+  </h1>
+  <p className="text-white/40 text-sm mt-2">Connexion au tableau de bord</p>
+</div>
+          </div>
           <h1 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-[0.05em]">Deslud Admin</h1>
           <p className="text-white/40 text-sm mt-2">Connexion au tableau de bord</p>
         </div>
@@ -735,7 +750,16 @@ export default function Admin() {
         <aside className="hidden lg:flex w-56 xl:w-64 bg-navy min-h-screen flex-shrink-0 flex-col fixed left-0 top-0 bottom-0 z-40">
           <div className="p-5 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-blue-deslud rounded-xl flex items-center justify-center text-lg flex-shrink-0">💧</div>
+              <div className="w-9 h-9 bg-blue-deslud rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+              {/* Logo sidebar desktop */}
+<div className="p-5 border-b border-white/10">
+  <img
+    src="/logo.png"
+    alt="Deslud Plomberie"
+    className="h-10 w-auto object-contain brightness-0 invert"
+  />
+</div>
+              </div>
               <div className="leading-none"><div className="font-display font-black text-white text-sm uppercase tracking-[0.05em]">Deslud</div><div className="text-[9px] text-cyan-deslud font-bold tracking-[0.2em] uppercase">Admin</div></div>
             </div>
           </div>
