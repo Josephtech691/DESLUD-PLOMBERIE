@@ -118,7 +118,7 @@ export default function Navbar() {
 ‎<button onClick={() => handleNav('#hero')} className="flex items-center gap-3">
 ‎  <div className="w-36 sm:w-40 flex-shrink-0">
 ‎    <img
-‎      src="images/logodeslud.png"
+‎      src="logo.png"
 ‎      alt="Deslud Plomberie"
 ‎      className="w-full h-auto object-contain"
 ‎      style={{ maxHeight: '48px' }}
