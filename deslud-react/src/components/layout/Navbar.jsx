@@ -117,7 +117,7 @@ export default function Navbar() {
           {/* Logo */}
           <button onClick={() => handleNav('#hero')} className="flex items-center gap-3">
             <div className="w-11 h-11 bg-blue-deslud rounded-xl flex items-center justify-center text-2xl shadow-glow-blue flex-shrink-0">
-            <img src="logodeslud.png" alt="DESLUD PLOMBERIE"/>
+            <img src="/images/logodeslud.png" alt="DESLUD PLOMBERIE"/>
             </div>
             <div className="leading-none hidden sm:block">
               <div className="font-display text-xl font-black text-white uppercase tracking-[0.05em]">Deslud</div>
