@@ -1,4 +1,4 @@
-// src/components/layout/Navbar.jsx
+divcomponents/layout/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Phone } from 'lucide-react';
@@ -116,7 +116,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <button onClick={() => handleNav('#hero')} className="flex items-center gap-3">
-            <div>
+            <div ‎className="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-2xl shadow-glow-blue flex-shrink-0">
             <img src="/images/logodeslud.png" alt="DESLUD PLOMBERIE"/>
             </div>
             <div className="leading-none hidden sm:block">
