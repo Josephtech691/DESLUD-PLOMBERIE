@@ -53,7 +53,7 @@ export default function Footer() {
 ‎<div>
 ‎  <div className="mb-5">
 ‎    <img
-‎      src="images/logodeslud.png"
+‎      src="logo.png"
 ‎      alt="Deslud Plomberie"
 ‎      className="h-14 w-auto object-contain brightness-0 invert"
 ‎    />
