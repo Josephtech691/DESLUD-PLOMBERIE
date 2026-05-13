@@ -1,4 +1,4 @@
-// src/components/layout/Footer.jsx
+// src/components/layout/Footer
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
