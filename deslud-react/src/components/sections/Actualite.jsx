@@ -32,7 +32,7 @@ export default function Actualites() {
   const startX      = useRef(0);
   const scrollLeft  = useRef(0);
 
-  // Charger les actualités
+  // Charger les actualité
   useEffect(() => {
     fetch(`${API}/actualites`)
       .then(r => r.json())
