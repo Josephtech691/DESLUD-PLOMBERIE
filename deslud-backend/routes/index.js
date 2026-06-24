@@ -14,55 +14,7 @@ const { login, logout, getMe, changePassword, getAllUsers, createUser, toggleUse
 // Middleware
 const { authenticate, requireSuperAdmin } = require('../middleware/auth');
 const { validate, contactRules, devisRules, devisStatutRules, loginRules, adminCreateRules, temoignageRules, newsletterRules, uuidParam } = require('../middleware/validation');
-// Route reset admin - temporaire
-router.get('/reset-admin', async (req, res) => {
-  if (req.query.key !== 'deslud2024reset') {
-    return res.status(403).json({ success: false, message: 'Interdit.' });
-  }
-  try {
-    const bcrypt = require('bcryptjs');
-    const { v4: uuidv4 } = require('uuid');
-    const email    = 'admin@deslud-plomberie.cm';
-    const password = 'Admin@Deslud2024!';
-    const hashed   = bcrypt.hashSync(password, 12);
 
-    // Vérifier si la table users existe
-    await query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        nom TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT DEFAULT 'admin',
-        actif INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // Supprimer et recréer l'admin
-    await query('DELETE FROM users WHERE email = $1', [email]);
-    await query(
-      'INSERT INTO users (id, nom, email, password, role, actif) VALUES ($1,$2,$3,$4,$5,$6)',
-      [uuidv4(), 'Super Admin', email, hashed, 'super_admin', 1]
-    );
-
-    // Vérification
-    const user = (await query(
-      'SELECT id, email, role, actif, LENGTH(password) as pass_length FROM users WHERE email = $1',
-      [email]
-    )).rows[0];
-
-    res.json({
-      success: true,
-      message: '✅ Admin recréé avec succès !',
-      user,
-      credentials: { email, password }
-    });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message, stack: e.stack });
-  }
-});
 // ============================================================
 // 🛠️ ROUTES UTILITAIRES
 // ============================================================
